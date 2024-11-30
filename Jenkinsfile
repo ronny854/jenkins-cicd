@@ -1,57 +1,96 @@
 pipeline {
     agent any
+    environment {
+        failedStage = ''
+    }
     stages {
         stage('Source') {
             steps {
-                echo 'content form fork repo git'
-                sh 'ls'
+                script {
+                    try {
+                        git 'https://github.com/srayuso/unir-cicd.git'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        env.failedStage = 'Source'
+                        throw e
+                    }
+                }
             }
         }
         stage('Build') {
             steps {
-                echo 'Building stage!'
-                sh 'make build'
+                script {
+                    try {
+                        echo 'Building stage!'
+                        sh 'make build'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        env.failedStage = 'Build'
+                        throw e
+                    }
+                }
             }
         }
         stage('Unit tests') {
             steps {
-                sh 'make test-unit'
-                archiveArtifacts artifacts: 'results/*.xml'
+                script {
+                    try {
+                        echo 'Running unit tests'
+                        sh 'make test-unit'
+                        archiveArtifacts artifacts: 'results/unit/*.xml'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        env.failedStage = 'Unit tests'
+                        throw e
+                    }
+                }
             }
         }
         stage('API tests') {
             steps {
-                echo 'Running API tests'
-                sh 'make test-api'
-                archiveArtifacts artifacts: 'results/api/*.xml'
+                script {
+                    try {
+                        echo 'Running API tests'
+                        sh 'make test-api'
+                        archiveArtifacts artifacts: 'results/api/*.xml'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        env.failedStage = 'API tests'
+                        throw e
+                    }
+                }
             }
         }
         stage('E2E tests') {
             steps {
-                echo 'Running E2E tests'
-                sh 'make test-e2e'
-                archiveArtifacts artifacts: 'results/*.xml'
+                script {
+                    try {
+                        echo 'Running E2E tests'
+                        sh 'make test-e2e'
+                        archiveArtifacts artifacts: 'results/e2e/*.xml'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        env.failedStage = 'E2E tests'
+                        throw e
+                    }
+                }
             }
         }
     }
     post {
         always {
-            junit 'results/*_result.xml'
+            echo 'Archiving test results and cleaning workspace'
+            junit 'results/**/*.xml'
             cleanWs()
         }
         failure {
             script {
-                // Obtener el nombre del stage fallido
-                def failedStage = env.STAGE_NAME ?: 'Unknown Stage'
-                
+                // Si alguna etapa falló, se recoge el nombre del stage
                 def jobName = env.JOB_NAME ?: 'Unknown Job'
                 def buildNumber = env.BUILD_NUMBER ?: 'Unknown Build'
-                echo "Sending email: The stage '${failedStage}' in job '${jobName}' (#${buildNumber}) has failed."
+                def failedStage = env.failedStage ?: 'Unknown Stage'
                 
-                // Descomenta la línea de envío de correo si es necesario
-                // mail to: 'team@example.com',
-                //      subject: "Job '${jobName}' (#${buildNumber}) Failed",
-                //      body: "The stage '${failedStage}' in job '${jobName}' has failed in build #${buildNumber}."
+                echo "Sending email: The stage '${failedStage}' in job '${jobName}' (#${buildNumber}) has failed."
             }
         }
     }
