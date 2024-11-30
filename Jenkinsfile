@@ -8,17 +8,17 @@ pipeline {
         // }
         stage('Build') {
             steps {
-                sh 'ls'
+                // sh 'ls'
                 echo 'Building stage!'
-                sh 'docker --version'
-                sh 'py --version'
-                // sh 'make build'
+                // sh 'docker --version'
+                // sh 'py --version'
+                sh 'make build'
             }
         }
         stage('Unit tests') {
             steps {
                 sh 'make test-unit'
-                // archiveArtifacts artifacts: 'results/*.xml'
+                archiveArtifacts artifacts: 'results/*.xml'
             }
         }
     }
