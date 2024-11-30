@@ -1,13 +1,14 @@
 pipeline {
     agent any
     stages {
-        stage('Source') {
-            steps {
-                git 'https://github.com/srayuso/unir-cicd.git'
-            }
-        }
+        // stage('Source') {
+        //     steps {
+        //         git 'https://github.com/srayuso/unir-cicd.git'
+        //     }
+        // }
         stage('Build') {
             steps {
+                sh 'ls'
                 echo 'Building stage!'
                 sh 'docker --version'
                 sh 'py --version'
