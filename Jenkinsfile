@@ -10,9 +10,8 @@ pipeline {
                 script{
                     env.failedStage = 'Source'
                     echo 'content form fork repo git'
-                    ls
                 }
-                // sh 'ls'
+                sh 'ls'
             }
         }
         stage('Build') {
@@ -20,17 +19,18 @@ pipeline {
                 script{
                     env.failedStage = 'Build'
                     echo 'Building stage!'
-                    make build
+                    // make build
                 }
-                // sh 'make build'
+                sh 'make build'
             }
         }
         stage('Unit tests') {
             steps {
                 script{
                     env.failedStage = 'Unit tests'
-                    make test-unit
+                    // make test-unit
                 }
+                sh 'make test-unit'
                 archiveArtifacts artifacts: 'results/*.xml'
             }
         }
@@ -39,9 +39,9 @@ pipeline {
                 script{
                     env.failedStage = 'API tests'
                     echo 'Running API tests'
-                    make test-api                   
+                    // make test-api                   
                 }
-                // sh 'make test-api'
+                sh 'make test-api'
                 archiveArtifacts artifacts: 'results/api/*.xml'
             }
         }
@@ -50,9 +50,9 @@ pipeline {
                 script{
                     env.failedStage = 'E2E tests'
                     echo 'Running E2E tests'
-                    make test-e2e
+                    // make test-e2e
                 }
-                // sh 'make test-e2e'
+                sh 'make test-e2e'
                 archiveArtifacts artifacts: 'results/*.xml'
             }
         }
@@ -65,6 +65,7 @@ pipeline {
         failure {
             script {
                 // Obtener el nombre del stage fallido
+                echo "env=${env.failedStage}"
                 def failedStageName = env.failedStage ?: 'Unknown Stage'
                 
                 def jobName = env.JOB_NAME ?: 'Unknown Job'
