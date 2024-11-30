@@ -42,7 +42,7 @@ pipeline {
         failure {
             script {
                 // Obtener el nombre del stage fallido
-                def failedStage = currentBuild.currentResult == 'FAILURE' ? currentStage.name : 'Unknown Stage'
+                def failedStage = env.STAGE_NAME ?: 'Unknown Stage'
                 
                 def jobName = env.JOB_NAME ?: 'Unknown Job'
                 def buildNumber = env.BUILD_NUMBER ?: 'Unknown Build'
