@@ -1,3 +1,5 @@
+
+def FAILE_STAGE
 pipeline {
     agent any
 
@@ -8,7 +10,7 @@ pipeline {
         stage('Source') {
             steps {
                 script{
-                    env.failedStage = 'Source'
+                    FAILE_STAGE = 'Source'
                     echo 'content form fork repo git'
                 }
                 sh 'ls'
@@ -17,7 +19,7 @@ pipeline {
         stage('Build') {
             steps {
                 script{
-                    env.failedStage = 'Build'
+                    FAILE_STAGE = 'Build'
                     echo 'Building stage!'
                     // make build
                 }
@@ -27,7 +29,7 @@ pipeline {
         stage('Unit tests') {
             steps {
                 script{
-                    env.failedStage = 'Unit tests'
+                    FAILE_STAGE = 'Unit tests'
                     // make test-unit
                 }
                 sh 'make test-unit'
@@ -37,7 +39,7 @@ pipeline {
         stage('API tests') {
             steps {
                 script{
-                    env.failedStage = 'API tests'
+                    FAILE_STAGE = 'API tests'
                     echo 'Running API tests'
                     // make test-api                   
                 }
@@ -48,7 +50,7 @@ pipeline {
         stage('E2E tests') {
             steps {
                 script{
-                    env.failedStage = 'E2E tests'
+                    FAILE_STAGE = 'E2E tests'
                     echo 'Running E2E tests'
                     // make test-e2e
                 }
@@ -65,7 +67,7 @@ pipeline {
         failure {
             script {
                 // Obtener el nombre del stage fallido
-                echo "env=${env.failedStage}"
+                echo "env=${FAILE_STAGE}"
                 def failedStageName = env.failedStage ?: 'Unknown Stage'
                 
                 def jobName = env.JOB_NAME ?: 'Unknown Job'
