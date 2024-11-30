@@ -37,7 +37,7 @@ pipeline {
                     echo 'Running API tests'               
                 }
                 sh 'make test-api'
-                archiveArtifacts artifacts: 'results/api/*.xml'
+                archiveArtifacts artifacts: 'results/*.xml'
             }
         }
         stage('E2E tests') {
