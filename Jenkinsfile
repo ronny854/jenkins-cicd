@@ -23,7 +23,7 @@ pipeline {
             steps {
                 echo 'Running API tests'
                 sh 'make test-api'
-                archiveArtifacts artifacts: 'results/*.xml'
+                archiveArtifacts artifacts: 'results/api/*.xml'
             }
         }
         stage('E2E tests') {
@@ -41,12 +41,17 @@ pipeline {
         }
         failure {
             script {
+                // Obtener el nombre del stage fallido
+                def failedStage = currentBuild.currentResult == 'FAILURE' ? currentStage.name : 'Unknown Stage'
+                
                 def jobName = env.JOB_NAME ?: 'Unknown Job'
                 def buildNumber = env.BUILD_NUMBER ?: 'Unknown Build'
-                echo "Sending email: The job '${jobName}' (#${buildNumber}) has failed."
+                echo "Sending email: The stage '${failedStage}' in job '${jobName}' (#${buildNumber}) has failed."
+                
+                // Descomenta la línea de envío de correo si es necesario
                 // mail to: 'team@example.com',
                 //      subject: "Job '${jobName}' (#${buildNumber}) Failed",
-                //      body: "The pipeline job '${jobName}' has failed in build #${buildNumber}."
+                //      body: "The stage '${failedStage}' in job '${jobName}' has failed in build #${buildNumber}."
             }
         }
     }
